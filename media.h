@@ -10,13 +10,15 @@ class Media
 {
 public:
   Media();
+  virtual void add();
+  virtual void display();
   void setTitle(char* newTitle);
   void setYear(int newYear);
   char* getTitle();
   int getYear();
   ~Media();
   
-private:
+protected:
   char title[100];
   int year;
 };

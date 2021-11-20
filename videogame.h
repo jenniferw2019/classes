@@ -11,6 +11,8 @@ class Videogame : public Media
 
  public:
   Videogame();
+  void add();
+  void display();
   void setPublisher(char* newPublisher);
   void setRating(int newRating);
   char* getPublisher();
