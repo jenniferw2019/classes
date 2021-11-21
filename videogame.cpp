@@ -10,10 +10,10 @@ void Videogame::add()
 {
   Media::add();
   cout << "Type publisher" << endl;
-  cin >> publisher;
+  cin.get(publisher, 100);
   cin.get();
 
-  cout << "Type rating" << endl;
+  cout << "Give rating from 1 (bad) to 5 (great)" << endl;
   cin >> rating;
   cin.get();
 }
