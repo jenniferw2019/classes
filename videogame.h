@@ -1,3 +1,4 @@
+// header file for videogame
 #ifndef VIDEOGAME_H
 #define VIDEOGAME_H
 #include <iostream>
@@ -8,20 +9,21 @@ using namespace std;
 
 class Videogame : public Media
 {
-
+  //define functions
  public:
   Videogame();
-  void add();
+  bool add();
   void display();
   void setPublisher(char* newPublisher);
-  void setRating(int newRating);
+  void setRating(float newRating);
   char* getPublisher();
-  int getRating();
+  float getRating();
   ~Videogame();
   
  private:
+  //variables
   char publisher[100];
-  int rating;
+  float rating;
 };
 
 #endif

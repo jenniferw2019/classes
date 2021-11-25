@@ -1,13 +1,25 @@
+/*
+This program creates a database that includes videogames, music, and movies. User can add, search, and delete videogames/music/movies. 
+A "QUIT" command stops the program.
+When they add a digital media, they will be prompted to enter different fields (like title and year for example).
+There is one parent class, three child classes, and one main .cpp file.
+Author: Jennifer Wang
+11/23/21
+ */
+
+//main.cpp
 #include <iostream>
 #include <cstring>
 #include "media.h"
 #include "videogame.h"
+#include "music.h"
+#include "movies.h"
 #include <vector>
 
 using namespace std;
 
-void addMedia(Media* pMedia, vector<Media*>* pVector);
-void printMedia(vector<Media*> pMediaPrint);
+//declare functions
+bool addMedia(Media* pMedia, vector<Media*>* pVector);
 void searchMedia(vector<Media*> pMediaSearch);
 void deleteMedia(vector<Media*>* pMediaDelete);
 
@@ -23,46 +35,56 @@ int main()
 
   while (runProgram == true)
     {
+      char enter[20];
+
       cout << "Type ADD or SEARCH or DELETE or QUIT" << endl;
       cin.get(input,10);
       cin.get();
 
+      // if ADD is typed, asks what digial media user wants to add. user can add each kind of media including all information in each field
       if (strcmp(input, "ADD") == 0)
 	{
-	  Videogame* myVideogame = new Videogame();
-	  addMedia(myVideogame, ptrVecMedia);
-      
-	}
-
-      if (strcmp(input, "SEARCH") == 0)
-	{
-
-	  searchMedia(vecMediaList);
-	  
-	  /*
-	  cout << "Type Title" << endl;
-	  cin.get(inSearch,100);
+	  cout << "Do you want to enter a Videogame, Music, or Movie? Please enter 'VIDEOGAME' or 'MUSIC' or 'MOVIES'" << endl;
+	  cin >> enter;
 	  cin.get();
 
-	  for (vector<Media*>::iterator it = vecMediaList.begin(); it != vecMediaList.end(); it++)
+	  // if MUSIC is typed, creates a new entry for music
+	  if (strcmp(enter, "MUSIC") == 0)
 	    {
-	      if (strcmp(inSearch, (*it)->getTitle()) == 0)
-		{
-		  (*it)->display();
-		}
+	      Music* myMusic = new Music();
+	     runProgram =  addMedia(myMusic, ptrVecMedia);
+	      
 	    }
-	  */
-
+	  // if VIDEOGAME is typed, creates a new entey for videogame
+	  else if (strcmp(enter, "VIDEOGAME") == 0)
+	    {
+	      Videogame* myVideogame = new Videogame();
+	      runProgram = addMedia(myVideogame, ptrVecMedia);
+	    }
+	  // if MOVIES is typed, creates a new entry for movies
+	  else if (strcmp(enter, "MOVIES") == 0)
+	    {
+	      Movies* myMovies = new Movies();
+	      runProgram = addMedia(myMovies, ptrVecMedia);
+	    }
 	}
 
+      // if SEARCH is typed, prompts user to search for a digial media currently in the media data base by title or year.
+      //if multiple objects match, all are listed
+      if (strcmp(input, "SEARCH") == 0)
+	{
+	  searchMedia(vecMediaList); 
+	}
+
+      // if DELETE is tyoed, prompts user to search for what they want to delete and then asks for confirmation
       if (strcmp(input, "DELETE") == 0)
 	{
 	  deleteMedia(ptrVecMedia);
 	}
-      
+
+      // if QUIT is typed, the program stops
       if (strcmp(input, "QUIT") == 0)
 	{
-	  printMedia(vecMediaList);
 	  runProgram = false;
 	}
   
@@ -72,40 +94,32 @@ int main()
 
 }
 
-void addMedia(Media* pMedia, vector<Media*>* pVector)
+// add function
+bool addMedia(Media* pMedia, vector<Media*>* pVector)
 {
 
-  pMedia->add();
-  // pMedia->display();
+  bool correct;
+  correct = pMedia->add();
+
+  // adds the media type to vector of media
   pVector->push_back(pMedia);
+
+  return correct;
   
-  /*
-  Media* myMedia = new Media();
-  myMedia = myVideogame;
-  myMedia->display();
-  */
 }
 
-void printMedia(vector<Media*> pVecMedia)
-{
-  for (vector<Media*>::iterator it = pVecMedia.begin(); it != pVecMedia.end(); it++)
-    {
-      (*it)->display();
-    }
-}
-
+//search for a specific media function
 void searchMedia(vector<Media*> pVecMedia)
 {
   char inSearchTitle[100];
   int inSearchYear = 0;
   char search;
-
+  
   cout << "Search by Title or Year? Enter 'T' for Title or 'Y' for Year" << endl;
   cin >> search;
   cin.get();
-  cout << search << endl;
   
-  
+  //search by title
   if (search == 'T')
     {
       cout << "Enter Title" << endl;
@@ -123,22 +137,37 @@ void searchMedia(vector<Media*> pVecMedia)
       
     }
   
+  
   else if (search == 'Y')
     {
       cout << "Enter Year" << endl;
       cin >> inSearchYear;
-      cin.get();
-
-      for (vector<Media*>::iterator it = pVecMedia.begin(); it != pVecMedia.end(); it++)
+      if(cin.fail())
 	{
-	  if (inSearchYear == (*it)->getYear())
+	  cin.clear();
+	  cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	  cout << "Year must be int value" << endl;
+	  
+	}
+      else
+	{
+
+	  cin.get();
+	  
+	  for (vector<Media*>::iterator it = pVecMedia.begin(); it != pVecMedia.end(); it++)
 	    {
-	      (*it)->display();
+	      if (inSearchYear == (*it)->getYear())
+		{
+		  (*it)->display();
+		}
 	    }
 	}
+      
     }
+
 }
 
+//delete media function
 void deleteMedia(vector<Media*>* pDeleteMedia)
 {
 
@@ -147,21 +176,18 @@ void deleteMedia(vector<Media*>* pDeleteMedia)
   char search;
   char yesno;
   int count = 0;
-  int index = 0;
+  // int index = 0;
 
   cout << "Delete by Title or Year? Enter 'T' for Title or 'Y' for Year" << endl;
   cin >> search;
   cin.get();
-  //cout << search << endl;
-  
-  
+
+  //search by title
   if (search == 'T')
     {
       cout << "Enter Title" << endl;
       cin.get(inDeleteTitle,100);
       cin.get();
-      // cout << inDeleteTitle;
-      
       
       for (vector<Media*>::iterator it = pDeleteMedia->begin(); it != pDeleteMedia->end(); it++)
 	{
@@ -170,88 +196,123 @@ void deleteMedia(vector<Media*>* pDeleteMedia)
 	      (*it)->display();
 	      count++;
 	    }
+	 
 	}
 
-      cout << "Are you sure you want to delete these? Type 'y' for yes or 'n' for no" << endl;
-      cin >> yesno;
-      cin.get();
-
-      if (yesno == 'y')
+      if (count > 0)
 	{
+	  //ask if user wants to delete
+	  cout << "Are you sure you want to delete these? Type 'y' for yes or 'n' for no" << endl;
+	  cin >> yesno;
+	  cin.get();
 	  
-	  while(count != 0)
+	  if (yesno == 'y')
 	    {
-	      for (vector<Media*>:: iterator it = pDeleteMedia->begin(); it != pDeleteMedia->end(); it++)
+	      // cout << yesno << endl;
+	      //cout << count << endl;
+	      //if yes, deletes all media with the same title
+	      while(count != 0)
 		{
-		  
-		  if (strcmp(inDeleteTitle, (*it)->getTitle()) == 0)
+		  int index = 0;
+		  for (vector<Media*>:: iterator it = pDeleteMedia->begin(); it != pDeleteMedia->end(); it++)
 		    {
-		      delete *(pDeleteMedia->begin()+ index);
-		      pDeleteMedia->erase(pDeleteMedia->begin()+ index);
-		      count = count - 1;
-		      break;
-		    }
-		  else
-		    {
-		      index++;
+		      
+		      if (strcmp(inDeleteTitle, (*it)->getTitle()) == 0)
+			{
+			  delete *(pDeleteMedia->begin()+ index);
+			  pDeleteMedia->erase(pDeleteMedia->begin()+ index);
+			  count = count - 1;
+			  break;
+			}
+		      else
+			{
+			  index++;
+			}
 		    }
 		}
+	      
 	    }
-	  
+	  // if no, doesn't delete
+	  else
+	    {
+	      cout << "Ok, no delete" << endl;
+	    }
 	}
       else
 	{
-	  cout << "Ok, no delete" << endl;
-	} 
+	  cout << "No media found" << endl;
+	}
     }
   
 
-  
+  // search by year
  else if (search == 'Y')
     {
       cout << "Enter Year" << endl;
       cin >> inDeleteYear;
-      cin.get();
 
-      for (vector<Media*>::iterator it = pDeleteMedia->begin(); it != pDeleteMedia->end(); it++)
+      if(cin.fail())
 	{
-	  if (inDeleteYear == (*it)->getYear())
-	    {
-	      (*it)->display();
-	      count++;
-	    }
-	}
-
-      cout << "Are you sure you want to delete these? Type 'y' for yes or 'n' for no" << endl;
-      cin >> yesno;
-      cin.get();
-  
-      if (yesno == 'y')
-	{ 
-	  while(count != 0)
-	    {
-	      for (vector<Media*>:: iterator it = pDeleteMedia->begin(); it != pDeleteMedia->end(); it++)
-		{
-
-		  if (inDeleteYear == (*it)->getYear())
-		    {
-		      delete *(pDeleteMedia->begin()+ index);
-		      pDeleteMedia->erase(pDeleteMedia->begin()+ index);
-		      count = count - 1;
-		      break;
-		    }
-		  else
-		    {
-		      index++;
-		    }
-		}
-	    }
-	  
+	  cin.clear();
+	  cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	  cout << "Year must be int value" << endl;
 	}
       else
 	{
-	  cout << "Ok, no delete" << endl;
+	  cin.get();
+	  
+	  for (vector<Media*>::iterator it = pDeleteMedia->begin(); it != pDeleteMedia->end(); it++)
+	    {
+	      if (inDeleteYear == (*it)->getYear())
+		{
+		  (*it)->display();
+		  count++;
+		}
+	    }
+	
+	  if (count > 0)
+	    {
+	      //asks user if they want to delete
+	      cout << "Are you sure you want to delete these? Type 'y' for yes or 'n' for no" << endl;
+	      cin >> yesno;
+	      cin.get();
+	      
+	      if (yesno == 'y')
+		{
+		  //if yes, then delete all media with the same year
+		  while(count != 0)
+		    {
+		      int index = 0;
+		      for (vector<Media*>:: iterator it = pDeleteMedia->begin(); it != pDeleteMedia->end(); it++)
+			{
+			  
+			  if (inDeleteYear == (*it)->getYear())
+			    {
+			      delete *(pDeleteMedia->begin()+ index);
+			      pDeleteMedia->erase(pDeleteMedia->begin()+ index);
+			      count = count - 1;
+			      break;
+			    }
+			  else
+			    {
+			      index++;
+			    }
+			}
+		    }
+		  
+		}
+	      else
+		//if no, doesn't delete
+		{
+		  cout << "Ok, no delete" << endl;
+		}
+	    }
+	  else
+	    {
+	      cout << "No media found" << endl;
+	    }
 	}
-
+      
     }
 }
+
